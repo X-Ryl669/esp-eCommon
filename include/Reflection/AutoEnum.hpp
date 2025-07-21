@@ -279,7 +279,7 @@ namespace Refl
         Opt() : value((Type)-1) {}
 
         explicit operator bool() const { return value != (Type)-1; }
-        const bool inline isValid() const { return value != (Type)-1; }
+        bool inline isValid() const { return value != (Type)-1; }
         const E orElse(E other) const { return isValid() ? (E)value : other; }
         const E get() const { return (E)value; }
     private:
