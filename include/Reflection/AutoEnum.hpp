@@ -306,7 +306,6 @@ namespace Refl
         else if constexpr (isSorted<E>) {
             // A dichotomic search into an enum name to value not performing O(log N) search here
             constexpr auto & sup = _supports<E>();
-            const char * p = string.getData();
             size_t l = 0, r = sup.size() - 1;
             while(l <= r)
             {

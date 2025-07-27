@@ -2,16 +2,15 @@
 #define hpp_JSONSerDes_hpp
 
 // We need readonly strings
-#include "ROString.hpp"
-#include "RWString.hpp"
+#include "Strings/ROString.hpp"
+#include "Strings/RWString.hpp"
 // We need JSON too
 #include "JSON.hpp"
 // We need logs too for error reporting
-//#include "Log.hpp"
 #include <stdlib.h>
 // We need automated struct parsing
-#include "AutoEnum.hpp"
-#include "AutoStruct.hpp"
+#include "Reflection/AutoEnum.hpp"
+#include "Reflection/AutoStruct.hpp"
 
 
 // Allow serializing and deserializing std::vector or std::array
@@ -492,6 +491,60 @@ RWString serialize(T & obj)
     return Details::serializeToJSONKeyValue("", obj);
 }
 #endif
+
+/** A JSON escaping dynamic function wrapper. This is used to escape strings so they can respect the JSON format */
+size_t computeJSONStringRequiredSize(const ROString & input)
+{
+    // First pass, count the number of required output char
+    size_t count = 0; const char * p = input.getData();
+    for (size_t i = 0; i < input.getLength(); i++) {
+        switch (p[i]) {
+        case '"': count += 2; break;
+        case '\\': count += 2; break;
+        case '\b': count += 2; break;
+        case '\f': count += 2; break;
+        case '\n': count += 2; break;
+        case '\r': count += 2; break;
+        case '\t': count += 2; break;
+        default:
+            if ((uint8)p[i] <= '\x1f') {
+                count += 6;
+            } else {
+                count++;
+            }
+        }
+    }
+    return count;
+}
+
+RWString escapeJSONString(const ROString & input)
+{
+    size_t count = computeJSONStringRequiredSize(input);
+    RWString ret(0, count);
+    char * o = (char*)ret.getData();
+    static char hexDigits[] = "0123456789abcdef";
+    const char * p = input.getData();
+    for (size_t i = 0; i < input.getLength(); i++) {
+        switch (p[i]) {
+        case '"': *o++ = '\\'; *o++ = '"';   break;
+        case '\\': *o++ = '\\'; *o++ = '\\'; break;
+        case '\b': *o++ = '\\'; *o++ = 'b'; break;
+        case '\f': *o++ = '\\'; *o++ = 'f'; break;
+        case '\n': *o++ = '\\'; *o++ = 'n'; break;
+        case '\r': *o++ = '\\'; *o++ = 'r'; break;
+        case '\t': *o++ = '\\'; *o++ = 't'; break;
+        default:
+            if ((uint8)p[i] <= '\x1f') {
+                *o++ = '\\'; *o++ = 'u'; *o++ = '0'; *o++ = '0';
+                *o++ = hexDigits[p[i] >> 4]; *o++ = hexDigits[p[i] & 0xF];
+            } else {
+                *o++ = p[i];
+            }
+        }
+    }
+    *o = 0;
+    return ret;
+}
 
 
 #endif
