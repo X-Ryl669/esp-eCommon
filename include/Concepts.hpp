@@ -15,6 +15,9 @@ namespace Concepts
     /** Check if the Returned type is compatible with the Required type */
     template <typename Returned, typename Required> constexpr bool compatible_return_type_v = std::is_void_v<Required> || std::is_convertible_v<Returned, Required>;
 
+    namespace Details { struct Unobtainium {}; }
+    template <class... T> struct always_false : std::false_type {};
+    template <> struct always_false<Details::Unobtainium> : std::true_type {};
 }
 
 #endif
