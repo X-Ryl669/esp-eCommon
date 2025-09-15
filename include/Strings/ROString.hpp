@@ -29,9 +29,9 @@ private:
     // Interface
 public:
     /** Get a pointer on the data */
-    inline const char * getData() const     { return data; }
+    constexpr inline const char * getData() const     { return data; }
     /** Get the string length */
-    inline size_t       getLength() const   { return length; }
+    constexpr inline size_t       getLength() const   { return length; }
     /** Limit the string length to the given value
         @param newLength the new length
         @return true on success */
@@ -355,6 +355,8 @@ public:
     constexpr ROString(const char (&_data)[N]) : data(_data), length(N-1) { }
     /** Copy constructor */
     constexpr ROString(const ROString & copy) : data(copy.data), length(copy.length) {}
+    /** Move constructor */
+    constexpr ROString(ROString && copy) : data(copy.data), length(copy.length) { }
     /** Equal operator */
     inline ROString & operator = (const ROString & copy) { if (&copy != this) return Mutate(copy.data, copy.length); return *this; }
     /** Compare operator */

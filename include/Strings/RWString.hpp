@@ -168,6 +168,8 @@ public:
     /** Concatenation operator */
     RWString operator + (const RWString & other) const { RWString c(*this); c += other; return c; }
     /** Concatenation operator */
+    RWString operator + (const ROString & other) const { RWString c(*this); c += other; return c; }
+    /** Concatenation operator */
     RWString operator + (const char*  other) const     { RWString c(*this); c += other; return c; }
     /** Concatenation operator */
     RWString operator + (const char   other) const     { RWString c(*this); c += other; return c; }
